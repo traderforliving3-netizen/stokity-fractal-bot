@@ -1,1 +1,36 @@
 
+name: Build Stokity Fractal Bot APK
+
+on:
+  workflow_dispatch:  # Bisa dijalankan manual dari GitHub Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-setuptools git zip unzip openjdk-11-jdk
+          pip install --upgrade pip
+          pip install kivy buildozer cython
+
+      - name: Build APK
+        run: |
+          buildozer init || true
+          buildozer -v android debug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: stokity-fractal-bot-apk
+          path: bin/*.apk
